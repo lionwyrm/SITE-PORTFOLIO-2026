@@ -392,7 +392,7 @@ body {
 }
 
 .gallery-item:hover {
-  transform: scale(100.01);
+  transform: scale(1.02);
   border-color: var(--purple-neon);
   box-shadow: 0 0 16px rgba(148,53,242,0.7);
   z-index: 2;
