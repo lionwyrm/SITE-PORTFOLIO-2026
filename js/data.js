@@ -32,155 +32,20 @@ Também possuo extensa experiência em eventos. Busco oportunidades profissionai
 Vamos criar algo incrível juntos!`
   },
   
-  // ---- ARTES (organizadas por ano) ----
-  //
-  // ✏️  COMO EDITAR:
-  //   - Cada entrada em "anos" representa um ano na galeria.
-  //   - Os anos aparecem em ordem decrescente (2026 no topo).
-  //   - Em cada ano, adicione quantas artes quiser em "itens".
-  //   - "src": caminho da imagem  →  Ex: "assets/artes/floresta.png"
-  //            Se null, aparece um placeholder colorido.
-  //   - "titulo": nome da obra (aparece no lightbox ao abrir).
-  //
-  // ➕  ADICIONAR UM ANO NOVO: copie um bloco { ano: XXXX, itens: [...] }
-  // ➕  ADICIONAR UMA ARTE:    adicione { id: N, src: "caminho", titulo: "Nome" }
-  //                            dentro do array "itens" do ano correto.
-  //
-  // ⚠️  IDs devem ser únicos em todo o arquivo (não repita números).
-
-  artesPorAno: [
-    {
-      ano: 2026,
-      itens: [
-        { id: 101, src: null, titulo: "Arte 2026 – 01 · Floresta Neon" },
-        { id: 102, src: null, titulo: "Arte 2026 – 02 · Dragão Pixel" },
-        { id: 103, src: null, titulo: "Arte 2026 – 03 · Cidade Cyberpunk" },
-        { id: 104, src: null, titulo: "Arte 2026 – 04 · Personagem LionWyrm" },
-      ]
-
-    },
-    {
-      ano: 2025,
-      itens: [
-        { id: 201, src: "assets/artes/1.png", titulo: "Equipe IndieGO" },
-        { id: 202, src: "assets/artes/6.png", titulo: "Guerreiro em fundo nublado" },
-        { id: 203, src: null, titulo: "Arte 2025 – 03 · Tileset Floresta" },
-        { id: 204, src: null, titulo: "Arte 2025 – 04 · UI Concept" },
-        { id: 205, src: null, titulo: "Arte 2025 – 05 · Character Sheet" },
-      ]
-    },
-    {
-      ano: 2024,
-      itens: [
-        { id: 301, src: "assets/artes/2.jpg", titulo: "Projeto TOTEM: Herói Elemental" },
-        { id: 302, src: null, titulo: "Arte 2024 – 02 · Retrato Digital" },
-        { id: 303, src: null, titulo: "Arte 2024 – 03 · Concept Art" },
-      ]
-    },
-    {
-      ano: 2023,
-      itens: [
-        { id: 401, src: "assets/artes/3.jpg", titulo: "Auto-Retrato LIONWYRM" },
-        { id: 402, src: "assets/artes/4.jpg", titulo: "OC universo: SoulHackers" },
-        { id: 403, src: "assets/artes/5.jpg", titulo: "Black, Red and White Mages" },
-        { id: 404, src: "assets/artes/7.jpg", titulo: "Gênio" },
-      ]
-    },
-    {
-      ano: 2022,
-      itens: [
-        { id: 501, src: null, titulo: "Arte 2022 – 01 · Placeholder" },
-        { id: 502, src: null, titulo: "Arte 2022 – 02 · Placeholder" },
-        { id: 503, src: null, titulo: "Arte 2022 – 03 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2021,
-      itens: [
-        { id: 601, src: null, titulo: "Arte 2021 – 01 · Placeholder" },
-        { id: 602, src: null, titulo: "Arte 2021 – 02 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2020,
-      itens: [
-        { id: 701, src: "assets/artes/9.jpg", titulo: "Fan-Art: Sonya de FIRE EMBLEM" },
-        { id: 702, src: null, titulo: "Arte 2020 – 02 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2019,
-      itens: [
-        { id: 801, src: null, titulo: "Arte 2019 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2018,
-      itens: [
-        { id: 901, src: null, titulo: "Arte 2018 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2017,
-      itens: [
-        { id: 1001, src: null, titulo: "Arte 2017 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2016,
-      itens: [
-        { id: 1101, src: null, titulo: "Arte 2016 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2015,
-      itens: [
-        { id: 1201, src: null, titulo: "Arte 2015 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2014,
-      itens: [
-        { id: 1301, src: null, titulo: "Arte 2014 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2013,
-      itens: [
-        { id: 1401, src: null, titulo: "Arte 2013 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2012,
-      itens: [
-        { id: 1501, src: null, titulo: "Arte 2012 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2011,
-      itens: [
-        { id: 1601, src: null, titulo: "Arte 2011 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2010,
-      itens: [
-        { id: 1701, src: null, titulo: "Arte 2010 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2009,
-      itens: [
-        { id: 1801, src: null, titulo: "Arte 2009 – 01 · Placeholder" },
-      ]
-    },
-    {
-      ano: 2008,
-      itens: [
-        { id: 1901, src: null, titulo: "Arte 2008 – 01 · Placeholder" },
-      ]
-    },
-
+  // ---- ARTES ----
+  // 🖼️  Para cada arte, coloque o caminho da imagem em "src"
+  // e um título em "titulo". O campo "altura" controla o
+  // tamanho no mosaico (use valores entre 160 e 340).
+  artes: [
+      { id: 1, src: "assets/artes/1.png", titulo: "Equipe IndieGO",         altura: 340 },
+      { id: 2, src: "assets/artes/2.jpg", titulo: "Projeto TOTEM: Herói Elemental",          altura: 340 },
+      { id: 3, src: "assets/artes/3.jpg", titulo: "Auto-Retrato LIONWYRM",      altura: 340 },
+      { id: 4, src: "assets/artes/4.jpg", titulo: "OC universo: SoulHackers",   altura: 340 },
+      { id: 5, src: "assets/artes/5.jpg", titulo: "Black, Red and White Mages",        altura: 340 },
+      { id: 6, src: "assets/artes/6.png", titulo: "Guerreiro em fundo nublado",           altura: 340 },
+      { id: 7, src: "assets/artes/7.jpg", titulo: "Gênio",      altura: 340 },
+      { id: 8, src: "assets/artes/8.jpg", titulo: "Auto-Retrato 'Open Your Heart'",            altura: 340 },
+      { id: 9, src: "assets/artes/9.jpg", titulo: "Fan-Art: Sonya de FIRE EMBLEM",       altura: 340 },
   ],
 
   // ---- GAMES ----
