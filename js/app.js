@@ -104,7 +104,7 @@ const Pages = {
     return `
       <div class="main-content">
         <div class="hero-section">
-          <p class="hero-subtitle">✦ Bem-vindo ao portfólio de ✦</p>
+          <p class="hero-subtitle">✦ Bem-vindo ao portfólio de Lucas Damasio da Silva ✦</p>
         </div>
 
         <div class="categories-grid">
