@@ -19,7 +19,6 @@ const Router = {
     this.param = param;
     this.render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Atualiza URL sem recarregar (para o histórico do navegador)
     const hash = param ? `#${page}/${param}` : `#${page}`;
     history.pushState({ page, param }, '', hash);
   },
@@ -38,29 +37,26 @@ const Router = {
   render() {
     const app = document.getElementById('app');
     app.classList.remove('page-fade-in');
-    void app.offsetWidth; // força reflow para reiniciar animação
+    void app.offsetWidth;
     app.classList.add('page-fade-in');
 
-    // Topbar: atualiza link ativo
     document.querySelectorAll('.topbar-nav a').forEach(a => {
       a.classList.remove('active');
       if (a.dataset.page === this.current) a.classList.add('active');
     });
 
-    // Decide qual página renderizar
     switch (this.current) {
-      case 'home':            app.innerHTML = Pages.home();           break;
-      case 'artes':           app.innerHTML = Pages.artes();          break;
-      case 'games':           app.innerHTML = Pages.games();          break;
-      case 'game-detail':     app.innerHTML = Pages.gameDetail(this.param); break;
-      case 'trabalhos':       app.innerHTML = Pages.trabalhos();      break;
-      case 'trabalho-detail': app.innerHTML = Pages.trabalhoDetail(this.param); break;
-      case 'eventos':         app.innerHTML = Pages.eventos();        break;
-      case 'sobre':           app.innerHTML = Pages.sobre();          break;
+      case 'home':            app.innerHTML = Pages.home();                    break;
+      case 'artes':           app.innerHTML = Pages.artes();                   break;
+      case 'games':           app.innerHTML = Pages.games();                   break;
+      case 'game-detail':     app.innerHTML = Pages.gameDetail(this.param);    break;
+      case 'trabalhos':       app.innerHTML = Pages.trabalhos();               break;
+      case 'trabalho-detail': app.innerHTML = Pages.trabalhoDetail(this.param);break;
+      case 'eventos':         app.innerHTML = Pages.eventos();                 break;
+      case 'sobre':           app.innerHTML = Pages.sobre();                   break;
       default:                app.innerHTML = Pages.home();
     }
 
-    // Vincula eventos após renderizar
     Events.bind();
   }
 };
@@ -69,20 +65,15 @@ const Router = {
 // HELPERS: funções reutilizáveis
 // ------------------------------------------
 const H = {
-  // Gera um placeholder colorido quando não há imagem
   imgOrPlaceholder(src, alt, cssClass, emoji = '🖼️') {
-    if (src) {
-      return `<img src="${src}" alt="${alt}" class="${cssClass}" loading="lazy">`;
-    }
+    if (src) return `<img src="${src}" alt="${alt}" class="${cssClass}" loading="lazy">`;
     return `<div class="${cssClass}-placeholder">${emoji}</div>`;
   },
 
-  // Botão de voltar
   backBtn(page, label = '← Voltar') {
     return `<a href="#" class="btn-back" data-goto="${page}">${label}</a>`;
   },
 
-  // Cabeçalho de seção
   pageHeader(titulo, corAccent = '#9435F2') {
     return `
       <div class="page-header">
@@ -94,17 +85,90 @@ const H = {
 };
 
 // ------------------------------------------
+// LIGHTBOX: controla o visualizador em tela cheia
+// ------------------------------------------
+const Lightbox = {
+  // Lista flat de todas as artes (gerada ao abrir a página Artes)
+  items: [],
+  // Índice atual
+  index: 0,
+
+  // Monta o array flat na ordem da tela: anos desc, artes asc dentro do ano
+  buildItems() {
+    this.items = [];
+    PORTFOLIO_DATA.artesPorAno.forEach(grupo => {
+      grupo.itens.forEach(art => {
+        this.items.push({ ...art, ano: grupo.ano });
+      });
+    });
+  },
+
+  // Abre o lightbox no item pelo id da arte
+  openById(id) {
+    const idx = this.items.findIndex(a => a.id === Number(id));
+    if (idx === -1) return;
+    this.index = idx;
+    this.show();
+  },
+
+  // Exibe o lightbox com o item atual
+  show() {
+    const lb    = document.getElementById('lightbox');
+    const img   = document.getElementById('lb-img');
+    const ph    = document.getElementById('lb-placeholder');
+    const title = document.getElementById('lb-title');
+    const count = document.getElementById('lb-counter');
+
+    const art = this.items[this.index];
+
+    if (art.src) {
+      img.src = art.src;
+      img.alt = art.titulo;
+      img.hidden = false;
+      ph.hidden  = true;
+    } else {
+      img.hidden = true;
+      ph.hidden  = false;
+    }
+
+    title.textContent = art.titulo;
+    count.textContent = `${this.index + 1} / ${this.items.length}`;
+
+    // Botões prev/next: oculta se não há mais itens
+    document.getElementById('lb-prev').style.opacity = this.index > 0 ? '1' : '0.25';
+    document.getElementById('lb-next').style.opacity = this.index < this.items.length - 1 ? '1' : '0.25';
+
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden'; // trava o scroll da página
+  },
+
+  close() {
+    const lb = document.getElementById('lightbox');
+    if (!lb) return;
+    lb.hidden = true;
+    document.body.style.overflow = '';
+  },
+
+  prev() {
+    if (this.index > 0) { this.index--; this.show(); }
+  },
+
+  next() {
+    if (this.index < this.items.length - 1) { this.index++; this.show(); }
+  }
+};
+
+// ------------------------------------------
 // PAGES: constrói o HTML de cada página
 // ------------------------------------------
 const Pages = {
 
   // === HOME ===
   home() {
-    const d = PORTFOLIO_DATA.site;
     return `
       <div class="main-content">
         <div class="hero-section">
-          <p class="hero-subtitle">✦ Bem-vindo ao portfólio de Lucas Damasio da Silva ✦</p>
+          <p class="hero-subtitle">✦ Bem-vindo ao portfólio de ✦</p>
         </div>
 
         <div class="categories-grid">
@@ -147,26 +211,74 @@ const Pages = {
   },
 
   // === ARTES ===
+  // Grade de botões quadrados organizados por ano (desc).
+  // Clicar em qualquer botão abre o lightbox.
   artes() {
-    const itens = PORTFOLIO_DATA.artes;
-    const mosaico = itens.map(art => `
-      <div class="gallery-item" title="${art.titulo}">
-        ${art.src
-          ? `<img src="${art.src}" alt="${art.titulo}" loading="lazy">`
-          : `<div class="gallery-placeholder" style="height:${art.altura}px">
-               🖼️<br><small style="display:block;margin-top:8px;font-size:0.7rem">${art.titulo}</small>
-             </div>`
-        }
-      </div>
-    `).join('');
+    Lightbox.buildItems();
+
+    const grupos = PORTFOLIO_DATA.artesPorAno;
+
+    const secoes = grupos.map(grupo => {
+      // Não renderiza o ano se não tiver nenhuma arte
+      if (!grupo.itens || grupo.itens.length === 0) return '';
+
+      const quadros = grupo.itens.map(art => `
+        <button
+          class="art-thumb-btn"
+          data-art-id="${art.id}"
+          aria-label="Ver arte: ${art.titulo}"
+          title="${art.titulo}"
+        >
+          ${art.src
+            ? `<img src="${art.src}" alt="${art.titulo}" loading="lazy" class="art-thumb-img">`
+            : `<div class="art-thumb-placeholder">🖼️</div>`
+          }
+        </button>
+      `).join('');
+
+      return `
+        <section class="art-year-section">
+          <h2 class="art-year-label">${grupo.ano}</h2>
+          <div class="art-thumb-grid">
+            ${quadros}
+          </div>
+        </section>
+      `;
+    }).join('');
 
     return `
       <div class="main-content">
         ${H.backBtn('home', '← Início')}
         ${H.pageHeader('ARTES', '#9435F2')}
-        <div class="gallery-mosaic">
-          ${mosaico}
+        ${secoes}
+      </div>
+
+      <!-- =============================================
+           LIGHTBOX — tela cheia ao clicar numa arte
+           ============================================= -->
+      <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Visualizador de arte" hidden>
+
+        <!-- Botão fechar (X) -->
+        <button class="lightbox-btn lightbox-close" id="lb-close" aria-label="Fechar">✕</button>
+
+        <!-- Seta esquerda -->
+        <button class="lightbox-btn lightbox-prev" id="lb-prev" aria-label="Arte anterior">&#8592;</button>
+
+        <!-- Seta direita -->
+        <button class="lightbox-btn lightbox-next" id="lb-next" aria-label="Próxima arte">&#8594;</button>
+
+        <!-- Área da imagem -->
+        <div class="lightbox-img-wrap">
+          <div class="lightbox-placeholder" id="lb-placeholder">🖼️</div>
+          <img id="lb-img" src="" alt="" class="lightbox-img" hidden>
         </div>
+
+        <!-- Legenda e contador -->
+        <div class="lightbox-caption">
+          <span id="lb-title"></span>
+          <span id="lb-counter" class="lightbox-counter"></span>
+        </div>
+
       </div>
     `;
   },
@@ -302,7 +414,6 @@ const Pages = {
         </div>
         <div class="event-caption">${ev.titulo}</div>
 
-        <!-- Overlay de informações: aparece ao clicar -->
         <div class="event-overlay">
           <button class="event-close" data-close-event="${ev.id}">✕</button>
           <h3 class="event-overlay-title">${ev.titulo}</h3>
@@ -338,14 +449,10 @@ const Pages = {
             <div class="about-photo-frame">
               ${s.foto
                 ? `<img src="${s.foto}" alt="Foto de ${s.nome}">`
-                : `<div class="about-photo-placeholder">
-                     <span>🧑‍🎨</span>
-                   </div>`
+                : `<div class="about-photo-placeholder"><span>🧑‍🎨</span></div>`
               }
             </div>
-            <p class="about-photo-label">
-              📷 ${s.nome} · ${s.apelido}
-            </p>
+            <p class="about-photo-label">📷 ${s.nome} · ${s.apelido}</p>
           </div>
 
           <div class="about-text-col">
@@ -368,26 +475,47 @@ const Pages = {
 // ------------------------------------------
 const Events = {
   bind() {
-    // Navegação: qualquer elemento com data-goto
+    // ── Navegação geral (data-goto) ──────────────────────────
     document.querySelectorAll('[data-goto]').forEach(el => {
       el.addEventListener('click', e => {
         e.preventDefault();
-        const page  = el.dataset.goto;
-        const param = el.dataset.param || null;
-        Router.go(page, param);
+        Router.go(el.dataset.goto, el.dataset.param || null);
       });
     });
 
-    // Eventos: abrir overlay ao clicar no card
+    // ── Galeria de Artes: abrir lightbox ─────────────────────
+    document.querySelectorAll('.art-thumb-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Lightbox.openById(btn.dataset.artId);
+      });
+    });
+
+    // ── Lightbox: botões ─────────────────────────────────────
+    const lbClose = document.getElementById('lb-close');
+    const lbPrev  = document.getElementById('lb-prev');
+    const lbNext  = document.getElementById('lb-next');
+    const lb      = document.getElementById('lightbox');
+
+    if (lbClose) lbClose.addEventListener('click', () => Lightbox.close());
+    if (lbPrev)  lbPrev.addEventListener( 'click', () => Lightbox.prev());
+    if (lbNext)  lbNext.addEventListener( 'click', () => Lightbox.next());
+
+    // Fechar clicando no fundo escuro (fora da imagem)
+    if (lb) {
+      lb.addEventListener('click', e => {
+        if (e.target === lb) Lightbox.close();
+      });
+    }
+
+    // ── Eventos: abrir overlay ───────────────────────────────
     document.querySelectorAll('.event-card').forEach(card => {
       card.addEventListener('click', e => {
-        // Se clicou no botão fechar, não abre
         if (e.target.closest('[data-close-event]')) return;
         card.classList.toggle('active');
       });
     });
 
-    // Eventos: fechar overlay
+    // ── Eventos: fechar overlay ──────────────────────────────
     document.querySelectorAll('[data-close-event]').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
@@ -396,6 +524,15 @@ const Events = {
     });
   }
 };
+
+// ── Teclado: setas e ESC para o lightbox ────────────────────
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lightbox');
+  if (!lb || lb.hidden) return;
+  if (e.key === 'Escape')      Lightbox.close();
+  if (e.key === 'ArrowLeft')   Lightbox.prev();
+  if (e.key === 'ArrowRight')  Lightbox.next();
+});
 
 // ------------------------------------------
 // TOPBAR: constrói o cabeçalho fixo
@@ -415,7 +552,6 @@ function buildTopbar() {
       <a href="#" data-goto="sobre"     data-page="sobre">Sobre</a>
     </nav>
   `;
-  // Vincula cliques da topbar
   topbar.querySelectorAll('[data-goto]').forEach(el => {
     el.addEventListener('click', e => {
       e.preventDefault();
@@ -425,14 +561,13 @@ function buildTopbar() {
 }
 
 // ------------------------------------------
-// INIT: inicializa o site ao carregar
+// INIT
 // ------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   buildTopbar();
-  Router.render();         // Renderiza home
-  Router.fromURL();        // Ou a página da URL atual
+  Router.render();
+  Router.fromURL();
 
-  // Botão Voltar do navegador
   window.addEventListener('popstate', e => {
     if (e.state) {
       Router.current = e.state.page;
